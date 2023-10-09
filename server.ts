@@ -96,10 +96,9 @@ app.get(eventsPagePath, async (req, res) => {
       const events = response.data.items;
 
       // Print the event summaries.
-      for (const event of events) {
-        console.log("event.summary?", event.summary);
-      }
-      res.send(events.map((e: any) => e.summary))
+      const eventSummaries = events.map((e: any) => e.summary)
+      console.log("eventSummaries?", eventSummaries);
+      res.send(eventSummaries)
     } catch (error) {
       console.error('Failed to fetch events list?', error);
       res.send(error)
