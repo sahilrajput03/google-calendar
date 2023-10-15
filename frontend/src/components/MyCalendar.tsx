@@ -86,6 +86,7 @@ export default function MyCalendar() {
 	// Last Week
 	// This Month
 	// Last Month
+	// ? LEARN: DefaultRanges.js file = https://github.com/hypeserver/react-date-range/blob/222d80c0d84147d346f2676cd590824bb6782a85/src/defaultRanges.js
 	const staticRanges = createStaticRanges([
 		defaultStaticRanges.find((staticRange) => staticRange.label === 'Today') as any,
 		defaultStaticRanges.find((staticRange) => staticRange.label === 'Yesterday') as any,
