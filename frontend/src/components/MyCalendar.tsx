@@ -142,8 +142,7 @@ export default function MyCalendar() {
 
 			<h1>Events</h1>
 			{events?.map((event) =>
-				<div
-					id={event.id}>
+				<div key={event.id}>
 					{formatDate(event.start?.dateTime)} | {event.summary}
 				</div>)}
 		</div>
