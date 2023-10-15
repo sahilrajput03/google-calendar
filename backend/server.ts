@@ -99,6 +99,8 @@ app.get('/auth/callback', async (req, res) => {
 })
 
 app.get('/auth/setup-oauth-client', async (req, res) => {
+  // ? IMPORTANT NOTE: This `code` expires after one usage only, so if you hit
+  // ? same API twice it may crash the OAUTH client.
   const { code } = req.query
   let { tokens } = await oauth2Client.getToken(code as string) as any;
   oauth2Client.setCredentials(tokens);
