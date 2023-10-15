@@ -11,8 +11,13 @@ export async function setupOauthClientApi(code: string) {
 	});
 }
 
-export async function getEventsByRange(start: string, end: string) {
+export async function getEventsByRange(
+	start: string,
+	end: string,
+	signal?: AbortSignal,
+) {
 	return axios.get(`${apiUrl}/range`, {
-		params: { start, end }
+		params: { start, end },
+		signal,
 	});
 }

@@ -31,17 +31,20 @@ const AuthHandle = () => {
 function App() {
   return (
     <>
+      <h1 style={{ textAlign: 'center' }}>Google Calendar Extended</h1>
+
+      {/* Navigation Menu */}
+      <div style={{ display: 'flex', justifyContent: 'center', margin: '30px 0px 25px' }}>
+        <a href="/">HOME </a>
+        <span style={{ padding: '0px 10px' }}>|</span>
+        <a href={`${apiUrl}/auth`}>AUTHENTICATE</a>
+      </div>
+
       <Routes>
         <Route path="/" element={<MyCalendar />} />
         <Route path="/auth/callback" element={<AuthHandle />} />
       </Routes>
 
-      {/* Navigation Menu */}
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <a href="/">HOME </a>
-        <span style={{ padding: '0px 10px' }}>-</span>
-        <a href={`${apiUrl}/auth`}>AUTHENTICATE</a>
-      </div>
     </>
   )
 }

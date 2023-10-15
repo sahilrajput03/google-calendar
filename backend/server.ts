@@ -141,7 +141,7 @@ app.get(eventsPagePath, async (req, res) => {
     res.send(eventSummaries)
   } catch (error) {
     console.error('Failed to fetch events list?', error);
-    res.send(error)
+    res.status(400).json(error)
   }
 })
 
@@ -173,7 +173,7 @@ app.get('/range', async (req, res) => {
     }
   } catch (error) {
     console.error('Failed to fetch events list?', error);
-    res.send(error)
+    res.status(400).json(error)
   }
 })
 

@@ -1,10 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { DateRangePicker, RangeKeyDict, createStaticRanges, defaultStaticRanges } from 'react-date-range';
 import { getEventsByRange } from '../api/events';
 import { EventType } from '../types';
 import { formatDate } from '../date-utils';
-import { endOfISOWeek, isSameDay, startOfISOWeek, subDays } from 'date-fns';
+import { lastWeek, nextMonth, nextWeek, thisWeek, uptoEndOfMonth, uptoEndOfWeek } from '../utils-custom-range';
+import { flushSync } from 'react-dom';
+
+// Reference file - https://github.com/hypeserver/react-date-range/blob/222d80c0d84147d346f2676cd590824bb6782a85/src/defaultRanges.js
 
 type SelectionRange = {
 	startDate?: Date
@@ -24,6 +27,7 @@ export default function MyCalendar() {
 		endDate: endOfToday,
 		key: 'selection',
 	})
+	const abortControllerRef = useRef<AbortController | null>(null);
 
 	useEffect(() => {
 		async function main() {
@@ -61,8 +65,23 @@ export default function MyCalendar() {
 		}
 
 		setSelectionRange(selected)
-		const res = await getEventsByRange(selected.startDate!.toJSON(), selected.endDate!.toJSON())
-		setEvents(res.data)
+		if (abortControllerRef.current) {
+			abortControllerRef.current.abort();
+		}
+		abortControllerRef.current = new AbortController();
+		const res = await getEventsByRange(
+			selected.startDate!.toJSON(),
+			selected.endDate!.toJSON(),
+			abortControllerRef.current.signal
+		)
+		flushSync(() => {
+			setEvents(res.data)
+		});
+		window.scrollTo({
+			top: document.body.scrollHeight,
+			left: 0,
+			behavior: 'smooth'
+		});
 
 		// TODO: Make duplidate for specific dates for above calendar days
 		// TODO: For this I need to multiple `event` items and then call `setEvents` with those duplicate events.
@@ -88,46 +107,21 @@ export default function MyCalendar() {
 	// Last Month
 	// ? LEARN: DefaultRanges.js file = https://github.com/hypeserver/react-date-range/blob/222d80c0d84147d346f2676cd590824bb6782a85/src/defaultRanges.js
 	const staticRanges = createStaticRanges([
-		defaultStaticRanges.find((staticRange) => staticRange.label === 'Today') as any,
-		defaultStaticRanges.find((staticRange) => staticRange.label === 'Yesterday') as any,
-		{
-			label: 'Last week',
-			range: () => ({
-				startDate: startOfISOWeek(subDays(new Date(), 7)),
-				endDate: endOfISOWeek(subDays(new Date(), 7)),
-				key: 'selection'
-			}),
-			isSelected: (range) => {
-				if (range.startDate && range.endDate) {
-					return (
-						isSameDay(range.startDate, startOfISOWeek(subDays(new Date(), 7))) &&
-						isSameDay(range.endDate, endOfISOWeek(subDays(new Date(), 7)))
-					)
-				}
-				return false;
-			}
-		},
-		{
-			label: 'This week',
-			range: () => ({
-				startDate: startOfISOWeek(new Date()),
-				endDate: endOfISOWeek(new Date()),
-				key: 'selection'
-			}),
-			isSelected: (range) => {
-				if (range.startDate && range.endDate) {
-					return (
-						isSameDay(range?.startDate, startOfISOWeek(new Date())) &&
-						isSameDay(range?.endDate, endOfISOWeek(new Date()))
-					)
-				}
-				return false;
-			}
-		},
-		defaultStaticRanges.find((staticRange) => staticRange.label === 'This Month') as any,
 		defaultStaticRanges.find((staticRange) => staticRange.label === 'Last Month') as any,
-		// Ad other ranges as per need
+		lastWeek,
+		defaultStaticRanges.find((staticRange) => staticRange.label === 'Yesterday') as any,
+		defaultStaticRanges.find((staticRange) => staticRange.label === 'Today') as any,
+		uptoEndOfWeek,
+		uptoEndOfMonth,
+		thisWeek,
+		nextWeek,
+		defaultStaticRanges.find((staticRange) => staticRange.label === 'This Month') as any,
+		nextMonth,
+		// My custom statis ranges:
+		// NOTE: Ad other ranges as per need
 	]);
+
+	const noEvents = events.length === 0
 
 	return (
 		<div>
@@ -138,14 +132,17 @@ export default function MyCalendar() {
 				staticRanges={staticRanges}
 				weekStartsOn={1}
 				// showPreview={false} // To disable hovering preview
-				inputRanges={[]} // Disable `Days Upto` feature
+				inputRanges={[]} // Disabled `Days Upto` feature because it was a bit buggy and feature also not desired.
 			/>
 
-			<h1>Events</h1>
-			{events?.map((event) =>
-				<div key={event.id}>
-					{formatDate(event.start?.dateTime)} | {event.summary}
-				</div>)}
+			<div className='events-container'>
+				<h1>Events</h1>
+				{noEvents ? 'No events' : events?.map((event) =>
+					<div key={event.id} >
+						{formatDate(event.start?.dateTime)} | {event.summary}
+					</div>
+				)}
+			</div>
 		</div>
 	);
 }
