@@ -72,7 +72,6 @@ export default function MyCalendar() {
 		//   }
 		// }
 	}
-
 	return (
 		<div>
 			<DateRangePicker
@@ -83,7 +82,7 @@ export default function MyCalendar() {
 			/>
 
 			<h1>Events</h1>
-			{events.map((event) =>
+			{events?.map((event) =>
 				<div
 					id={event.id}>
 					{formatDate(event.start.dateTime)} | {event.summary}

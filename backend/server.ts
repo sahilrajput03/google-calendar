@@ -65,7 +65,7 @@ app.get('/', (req, res) => {
 
 app.get('/auth', (req, res) => {
   const authorizationUrl = oauth2Client.generateAuthUrl({
-  // 'online' (default) or 'offline' (gets refresh_token)
+    // 'online' (default) or 'offline' (gets refresh_token)
     // access_type: 'offline',
     // If you only need one scope you can pass it as a string
     scope: scopes
@@ -166,7 +166,11 @@ app.get('/range', async (req, res) => {
     // console.log("eventSummaries?", eventSummaries);
     // res.send(eventSummaries)
 
-    res.send(events ?? 'Probably calendar is not initiated')
+    if (events) {
+      res.send(events)
+    } else {
+      res.status(400).send('Probably calendar is not initiated')
+    }
   } catch (error) {
     console.error('Failed to fetch events list?', error);
     res.send(error)
