@@ -1,0 +1,10 @@
+.rdrDateRangePickerWrapper {
+  display: flex !important;
+	justify-content: center;
+}
+
+@media (max-width: 600px) {
+  .rdrDateRangePickerWrapper {
+		flex-direction: column;
+  }
+}

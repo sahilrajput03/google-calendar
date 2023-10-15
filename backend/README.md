@@ -1,5 +1,11 @@
 # Google Calendar APIs
 
+
+## Service
+
+- System Service File path: `/etc/systemd/system/google-calendar-node.service`
+- Logs: `journalctl -fu google-calendar-node`
+
 Using google api using `googleapis`, official nodejs packge from google.
 
 Use `.env.template` to create your own `.env` file.
